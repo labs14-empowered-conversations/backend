@@ -64,11 +64,5 @@ public class SeedData implements CommandLineRunner
         users.add(new UserRoles(new User(), r2));
         User u5 = new User("labs4", "password", users);
         userService.save(u5);
-
-        for(var i = 7; i <= 50; i++) {
-            users = new ArrayList<>();
-            users.add(new UserRoles(new User(), r2));
-            userService.save(new User("labs" + i, "password", users));
-        }
     }
 }
