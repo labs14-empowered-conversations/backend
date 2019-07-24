@@ -1,1 +1,1 @@
-web: java -Dserver.port=52600 -jar tempEC/target/empoweredconversation.jar
+web: java -Dserver.port=52600 -jar target/empoweredconversation.jar
