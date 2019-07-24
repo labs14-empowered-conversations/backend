@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -Dserver.port=${PORT} -jar backend/tempEC/target/empoweredconversation.jar
+web: java $JAVA_OPTS -Dserver.port=${PORT} -jar /backend/tempEC/target/empoweredconversation.jar
