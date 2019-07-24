@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -jar tempEC/target/*.jar
+web: java -Dserver.port=$PORT -jar ./tempEC/target/*.jar
