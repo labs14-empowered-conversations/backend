@@ -1,1 +1,1 @@
-web: java -Dserver.port=52600 -jar target/empoweredconversation.jar
+web: java $JAVA_OPTS -Dserver.port=${PORT} -jar target\empoweredconversation.jar
