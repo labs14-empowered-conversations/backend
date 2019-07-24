@@ -49,12 +49,12 @@ public class EmpConvoController {
     @PostMapping(value="/conversations")
     public ResponseEntity<?> createNewConversation(@Valid @RequestBody Conversation newConvo) {
         Conversation createdConvo = convoService.save(newConvo);
-        String ACCOUNT_SID = "AC3004f5000c8be4bc0f62a04d63d5b6d0";
-        String AUTH_TOKEN = "5c3b289f7685463d37294c16208a6512";
+        String ACCOUNT_SID = System.getenv("TWILIO_SID");
+        String AUTH_TOKEN = System.getenv("TWILIO_TOKEN");
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("To", newConvo.getFfnumber()));
-        params.add(new BasicNameValuePair("From", "+19179206969"));
+        params.add(new BasicNameValuePair("From", "+18476968785"));
         params.add(new BasicNameValuePair("Body", "Someone you know would like to speak with you about a sensitive matter. " + "https://empowered-conversation.netlify.com/conversation/resources/" + "?cid=" + createdConvo.getConversationid()));
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
         try { messageFactory.create(params); } catch(Exception exc) { System.out.println(exc); };
@@ -80,12 +80,12 @@ public class EmpConvoController {
             }
         }
         Conversation createdConvo = convoService.findById(conversationid);
-        String ACCOUNT_SID = "AC3004f5000c8be4bc0f62a04d63d5b6d0";
-        String AUTH_TOKEN = "5c3b289f7685463d37294c16208a6512";
+        String ACCOUNT_SID = System.getenv("TWILIO_SID");
+        String AUTH_TOKEN = System.getenv("TWILIO_TOKEN");
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("To", createdConvo.getSurvivornumber()));
-        params.add(new BasicNameValuePair("From", "+19179206969"));
+        params.add(new BasicNameValuePair("From", "+18476968785"));
         params.add(new BasicNameValuePair("Body", createdConvo.getFfname() + " is ready to speak with you and has read resources to prepare themselves. Thank you for trusting in the Empowered Conversations service."));
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
         try { messageFactory.create(params); convoService.delete(conversationid); } catch(Exception exc) { throw new EntityNotFoundException(exc.toString()); };
