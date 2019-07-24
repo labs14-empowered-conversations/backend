@@ -27,6 +27,6 @@ public class SeedData implements CommandLineRunner
         convoService.save(c2);
 
         Conversation c3 = new Conversation( "318-637-3817", "Bobby", "318-271-4872");
-
+        convoService.save(c3);
     }
 }
