@@ -3,6 +3,7 @@ package com.lambdaschool.tempEC.services;
 import com.lambdaschool.tempEC.exceptions.ResourceNotFoundException;
 import com.lambdaschool.tempEC.models.Conversation;
 import com.lambdaschool.tempEC.repository.ConversationRepository;
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +18,17 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     public Conversation save(Conversation conversation) {
         Conversation newConvo = new Conversation();
+        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        textEncryptor.setPasswordCharArray(System.getenv("SECRET").toCharArray());
+
         if(conversation.getFfname() != null) {
-            newConvo.setFfname(conversation.getFfname());
+            newConvo.setFfname(textEncryptor.encrypt(conversation.getFfname()));
         }
         if(conversation.getFfnumber() != null) {
-            newConvo.setFfnumber(conversation.getFfnumber());
+            newConvo.setFfnumber(textEncryptor.encrypt(conversation.getFfnumber()));
         }
         if(conversation.getSurvivornumber() != null) {
-            newConvo.setSurvivornumber(conversation.getSurvivornumber());
+            newConvo.setSurvivornumber(textEncryptor.encrypt(conversation.getSurvivornumber()));
         }
         return restrepos.save(newConvo);
     }

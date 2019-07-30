@@ -8,6 +8,7 @@ import com.lambdaschool.tempEC.models.ErrorDetail;
 import com.lambdaschool.tempEC.services.ConversationService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,19 @@ public class EmpConvoController {
                             "Multiple sort criteria are supported.")})
     @GetMapping(value="/conversations")
     public ResponseEntity<?> findAllConvos() {
-        return new ResponseEntity<>(convoService.findAll(), HttpStatus.OK);
+        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        List<Conversation> encrypted = convoService.findAll();
+        textEncryptor.setPasswordCharArray(System.getenv("SECRET").toCharArray());
+        encrypted.iterator().forEachRemaining(convo ->
+                convo.setFfnumber(textEncryptor.encrypt(convo.getFfnumber())
+                ));
+        encrypted.iterator().forEachRemaining(convo ->
+                convo.setSurvivornumber(textEncryptor.encrypt(convo.getSurvivornumber())
+                ));
+        encrypted.iterator().forEachRemaining(convo ->
+                convo.setFfname(textEncryptor.encrypt(convo.getFfname())
+                ));
+        return new ResponseEntity<>(encrypted, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Create new conversation.", response=Conversation.class)
@@ -51,9 +64,11 @@ public class EmpConvoController {
         Conversation createdConvo = convoService.save(newConvo);
         String ACCOUNT_SID = System.getenv("TWILIO_SID");
         String AUTH_TOKEN = System.getenv("TWILIO_TOKEN");
+        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        textEncryptor.setPasswordCharArray(System.getenv("SECRET").toCharArray());
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("To", newConvo.getFfnumber()));
+        params.add(new BasicNameValuePair("To", textEncryptor.decrypt(newConvo.getFfnumber())));
         params.add(new BasicNameValuePair("From", "+18476968785"));
         params.add(new BasicNameValuePair("Body", "Someone you know would like to speak with you about a sensitive matter. " + "https://empowered-conversation.netlify.com/conversation/resources/" + "?cid=" + createdConvo.getConversationid()));
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
@@ -83,8 +98,10 @@ public class EmpConvoController {
         String ACCOUNT_SID = System.getenv("TWILIO_SID");
         String AUTH_TOKEN = System.getenv("TWILIO_TOKEN");
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
+        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        textEncryptor.setPasswordCharArray(System.getenv("SECRET").toCharArray());
         List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("To", createdConvo.getSurvivornumber()));
+        params.add(new BasicNameValuePair("To", textEncryptor.decrypt(createdConvo.getSurvivornumber())));
         params.add(new BasicNameValuePair("From", "+18476968785"));
         params.add(new BasicNameValuePair("Body", createdConvo.getFfname() + " is ready to speak with you and has read resources to prepare themselves. Thank you for trusting in the Empowered Conversations service."));
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
