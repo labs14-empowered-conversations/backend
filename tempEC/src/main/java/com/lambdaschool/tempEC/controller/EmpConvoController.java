@@ -73,7 +73,7 @@ public class EmpConvoController {
         params.add(new BasicNameValuePair("Body", "Someone you know would like to speak with you about a sensitive matter. " + "https://empowered-conversation.netlify.com/conversation/resources/" + "?cid=" + createdConvo.getConversationid()));
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
         try { messageFactory.create(params); } catch(Exception exc) { System.out.println(exc); };
-        return new ResponseEntity<>(createdConvo, HttpStatus.CREATED);
+        return new ResponseEntity<>("Success", HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Deletes conversation.", response=String.class)
@@ -99,7 +99,7 @@ public class EmpConvoController {
         String AUTH_TOKEN = System.getenv("TWILIO_TOKEN");
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
         BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
-        textEncryptor.setPasswordCharArray(System.getenv("SECRET").toCharArray());
+        textEncryptor.setPassword("ec");
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("To", textEncryptor.decrypt(createdConvo.getSurvivornumber())));
         params.add(new BasicNameValuePair("From", "+18476968785"));
