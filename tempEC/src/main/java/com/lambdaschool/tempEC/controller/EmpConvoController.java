@@ -53,10 +53,12 @@ public class EmpConvoController {
         String ACCOUNT_SID = System.getenv("TWILIO_SID");
         String AUTH_TOKEN = System.getenv("TWILIO_TOKEN");
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
+        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        textEncryptor.setPassword(System.getenv("SECRET"));
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("To", newConvo.getFfnumber()));
         params.add(new BasicNameValuePair("From", "+18476968785"));
-        params.add(new BasicNameValuePair("Body", "Someone you know would like to speak with you about a sensitive matter. " + "https://empowered-conversation.netlify.com/conversation/resources/" + "?cid=" + createdConvo.getConversationid()));
+        params.add(new BasicNameValuePair("Body", "Someone you know would like to speak with you about a sensitive matter. " + "https://empowered-conversation.netlify.com/conversation/resources/" + "?cid=" + textEncryptor.encrypt(Long.toString(createdConvo.getConversationid()))));
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
         try { messageFactory.create(params); } catch(Exception exc) { System.out.println(exc); };
         return new ResponseEntity<>("Success", HttpStatus.CREATED);
@@ -68,30 +70,31 @@ public class EmpConvoController {
             @ApiResponse(code=404, message = "Conversation ID not valid.", response = EntityNotFoundException.class),
     })
     @DeleteMapping(value="/conversations/finished/{conversationid}")
-    public ResponseEntity<?> finishConversation(@PathVariable long conversationid) {
+    public ResponseEntity<?> finishConversation(@PathVariable String conversationid) {
         ArrayList<Conversation> list = new ArrayList<>();
+        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        textEncryptor.setPassword(System.getenv("SECRET"));
         convoService.findAll().iterator().forEachRemaining(list::add);
+        Long newId = Long.parseLong(textEncryptor.decrypt(conversationid));
         for(Conversation c : list) {
-            if(c.getConversationid() == conversationid) {
+            if(c.getConversationid() == newId) {
                 break;
-            } else if(c.getConversationid() >= conversationid) {
+            } else if(c.getConversationid() >= newId) {
                 return new ResponseEntity<>("Conversation already deleted", HttpStatus.OK);
-            } else if(list.get(list.size()-1).getConversationid() < conversationid) {
+            } else if(list.get(list.size()-1).getConversationid() < newId) {
                 return new ResponseEntity<>("Conversation already deleted or doesn't exist", HttpStatus.OK);
             }
         }
-        Conversation foundConvo = convoService.findById(conversationid);
+        Conversation foundConvo = convoService.findById(newId);
         String ACCOUNT_SID = System.getenv("TWILIO_SID");
         String AUTH_TOKEN = System.getenv("TWILIO_TOKEN");
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
-        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
-        textEncryptor.setPassword(System.getenv("SECRET"));
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("To", textEncryptor.decrypt(foundConvo.getSurvivornumber())));
         params.add(new BasicNameValuePair("From", "+18476968785"));
         params.add(new BasicNameValuePair("Body", textEncryptor.decrypt(foundConvo.getFfname()) + " is ready to speak with you and has read resources to prepare themselves. Thank you for trusting in the Empowered Conversations service."));
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
-        try { messageFactory.create(params); convoService.delete(conversationid); } catch(Exception exc) { throw new EntityNotFoundException(exc.toString()); };
+        try { messageFactory.create(params); convoService.delete(newId); } catch(Exception exc) { throw new EntityNotFoundException(exc.toString()); };
         return new ResponseEntity<>("Conversation " + conversationid + " has been closed.", HttpStatus.OK);
     }
 }
