@@ -42,13 +42,13 @@ public class EmpConvoController {
         List<Conversation> encrypted = convoService.findAll();
         textEncryptor.setPassword(System.getenv("SECRET"));
         encrypted.iterator().forEachRemaining(convo ->
-                convo.setFfnumber(textEncryptor.encrypt(convo.getFfnumber())
+                convo.setFfnumber(convo.getFfnumber()
                 ));
         encrypted.iterator().forEachRemaining(convo ->
-                convo.setSurvivornumber(textEncryptor.encrypt(convo.getSurvivornumber())
+                convo.setSurvivornumber(convo.getSurvivornumber()
                 ));
         encrypted.iterator().forEachRemaining(convo ->
-                convo.setFfname(textEncryptor.encrypt(convo.getFfname())
+                convo.setFfname(convo.getFfname()
                 ));
         return new ResponseEntity<>(encrypted, HttpStatus.OK);
     }
@@ -99,7 +99,7 @@ public class EmpConvoController {
         String AUTH_TOKEN = System.getenv("TWILIO_TOKEN");
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
         BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
-        textEncryptor.setPassword("ec");
+        textEncryptor.setPassword(System.getenv("SECRET"));
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("To", textEncryptor.decrypt(createdConvo.getSurvivornumber())));
         params.add(new BasicNameValuePair("From", "+18476968785"));

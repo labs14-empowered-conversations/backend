@@ -20,7 +20,6 @@ public class ConversationServiceImpl implements ConversationService {
         Conversation newConvo = new Conversation();
         BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
         textEncryptor.setPasswordCharArray(System.getenv("SECRET").toCharArray());
-
         if(conversation.getFfname() != null) {
             newConvo.setFfname(textEncryptor.encrypt(conversation.getFfname()));
         }
