@@ -8,7 +8,8 @@ import com.lambdaschool.tempEC.models.ErrorDetail;
 import com.lambdaschool.tempEC.services.ConversationService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import org.jasypt.util.text.BasicTextEncryptor;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
+import org.jasypt.salt.RandomSaltGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,8 +54,9 @@ public class EmpConvoController {
         String ACCOUNT_SID = System.getenv("TWILIO_SID");
         String AUTH_TOKEN = System.getenv("TWILIO_TOKEN");
         TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN);
-        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        StandardPBEStringEncryptor textEncryptor = new StandardPBEStringEncryptor();
         textEncryptor.setPassword(System.getenv("SECRET"));
+        textEncryptor.setAlgorithm(System.getenv("METHOD"));
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("To", newConvo.getFfnumber()));
         params.add(new BasicNameValuePair("From", "+18476968785"));
@@ -72,8 +74,9 @@ public class EmpConvoController {
     @DeleteMapping(value="/conversations/finished/{conversationid}")
     public ResponseEntity<?> finishConversation(@PathVariable String conversationid) {
         ArrayList<Conversation> list = new ArrayList<>();
-        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        StandardPBEStringEncryptor textEncryptor = new StandardPBEStringEncryptor();
         textEncryptor.setPassword(System.getenv("SECRET"));
+        textEncryptor.setAlgorithm(System.getenv("METHOD"));
         convoService.findAll().iterator().forEachRemaining(list::add);
         Long newId = Long.parseLong(textEncryptor.decrypt(conversationid));
         for(Conversation c : list) {
