@@ -60,10 +60,10 @@ public class EmpConvoController {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("To", newConvo.getFfnumber()));
         params.add(new BasicNameValuePair("From", "+18476968785"));
-        params.add(new BasicNameValuePair("Body", "Someone you know would like to speak with you about a sensitive matter. " + "https://empowered-conversation.netlify.com/conversation/resources/" + "?cid=" + textEncryptor.encrypt(Long.toString(createdConvo.getConversationid()))));
+        params.add(new BasicNameValuePair("Body", "Hi " + newConvo.getFfname() + ", a friend or loved one is reaching out for support. Click here to help them: " + "https://empowered-conversation.netlify.com/conversation/resources/" + "?cid=" + textEncryptor.encrypt(Long.toString(createdConvo.getConversationid()))));
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
         try { messageFactory.create(params); } catch(Exception exc) { System.out.println(exc); };
-        return new ResponseEntity<>("Success", HttpStatus.CREATED);
+        return new ResponseEntity<>(createdConvo, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Deletes conversation.", response=String.class)
