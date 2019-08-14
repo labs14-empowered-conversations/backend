@@ -19,6 +19,7 @@ public class Conversation {
     }
 
     public Conversation(String survivornumber, String ffname, String ffnumber) {
+        this.school = "michigan";
         this.survivornumber = survivornumber;
         this.ffname = ffname;
         this.ffnumber = ffnumber;
