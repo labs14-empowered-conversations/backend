@@ -32,6 +32,9 @@ public class ConversationServiceImpl implements ConversationService {
         if(conversation.getSurvivornumber() != null) {
             newConvo.setSurvivornumber(textEncryptor.encrypt(conversation.getSurvivornumber()));
         }
+        if(conversation.getSchool() != null) {
+            newConvo.setSchool(conversation.getSchool());
+        }
         return restrepos.save(newConvo);
     }
 

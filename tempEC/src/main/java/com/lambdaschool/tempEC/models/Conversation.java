@@ -13,13 +13,31 @@ public class Conversation {
     private String ffname;
     private String ffnumber;
 
+    private String school;
+
     public Conversation() {
     }
 
     public Conversation(String survivornumber, String ffname, String ffnumber) {
+        this.school = "michigan";
         this.survivornumber = survivornumber;
         this.ffname = ffname;
         this.ffnumber = ffnumber;
+    }
+
+    public Conversation(String survivornumber, String ffname, String ffnumber, String school) {
+        this.survivornumber = survivornumber;
+        this.ffname = ffname;
+        this.ffnumber = ffnumber;
+        this.school = school;
+    }
+
+    public String getSchool() {
+        return school;
+    }
+
+    public void setSchool(String school) {
+        this.school = school;
     }
 
     public long getConversationid() {

@@ -58,11 +58,27 @@ public class EmpConvoController {
         textEncryptor.setPassword(System.getenv("SECRET"));
         textEncryptor.setAlgorithm(System.getenv("METHOD"));
         List<NameValuePair> params = new ArrayList<NameValuePair>();
+        String id = textEncryptor.encrypt(Long.toString(createdConvo.getConversationid()));
+        StringBuilder editedId = new StringBuilder(id);
+        String number = "+18476968785";
+        switch(newConvo.getSchool()) {
+            case "michigan" :
+                number = "+18476968785";
+                break;
+            case "northwestern" :
+                number = "+18476968785";
+                break;
+        }
+        if(id.indexOf('/') >= 0) {
+            editedId.setCharAt(id.indexOf('/'), '!');
+        } else {
+            System.out.println("Not a slash");
+        }
         params.add(new BasicNameValuePair("To", newConvo.getFfnumber()));
-        params.add(new BasicNameValuePair("From", "+18476968785"));
-        params.add(new BasicNameValuePair("Body", "Hi " + newConvo.getFfname() + ", a friend or loved one is reaching out for support. Click here to help them: " + "https://empowered-conversation.netlify.com/conversation/resources/" + "?cid=" + textEncryptor.encrypt(Long.toString(createdConvo.getConversationid()))));
+        params.add(new BasicNameValuePair("From", number));
+        params.add(new BasicNameValuePair("Body", "Hi " + newConvo.getFfname() + ", a friend or loved one is reaching out for support. Click here to help them: " + "https://empoweredconvo.com/" + createdConvo.getSchool() + "/learn/" + "?cid=" + editedId));
         MessageFactory messageFactory = client.getAccount().getMessageFactory();
-        try { messageFactory.create(params); } catch(Exception exc) { System.out.println(exc); };
+        try { messageFactory.create(params); createdConvo.setFfnumber(null); } catch(Exception exc) { System.out.println(exc); };
         return new ResponseEntity<>(createdConvo, HttpStatus.CREATED);
     }
 
@@ -78,7 +94,14 @@ public class EmpConvoController {
         textEncryptor.setPassword(System.getenv("SECRET"));
         textEncryptor.setAlgorithm(System.getenv("METHOD"));
         convoService.findAll().iterator().forEachRemaining(list::add);
-        Long newId = Long.parseLong(textEncryptor.decrypt(conversationid));
+        StringBuilder editedId = new StringBuilder(conversationid);
+        if(conversationid.indexOf('!') >= 0) {
+            editedId.setCharAt(conversationid.indexOf('!'), '/');
+        } else {
+            System.out.println("Not a slash");
+        }
+        conversationid = textEncryptor.decrypt(editedId.toString());
+        Long newId = Long.parseLong(conversationid);
         for(Conversation c : list) {
             if(c.getConversationid() == newId) {
                 break;
