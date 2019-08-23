@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "conversation")
-public class Conversation {
+public class Conversation extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long conversationid;
@@ -26,10 +26,10 @@ public class Conversation {
     }
 
     public Conversation(String survivornumber, String ffname, String ffnumber, String school) {
+        this.school = school;
         this.survivornumber = survivornumber;
         this.ffname = ffname;
         this.ffnumber = ffnumber;
-        this.school = school;
     }
 
     public String getSchool() {
