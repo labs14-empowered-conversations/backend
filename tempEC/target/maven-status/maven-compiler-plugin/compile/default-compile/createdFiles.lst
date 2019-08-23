@@ -2,6 +2,7 @@ com\lambdaschool\tempEC\exceptions\ValidationError.class
 com\lambdaschool\tempEC\handlers\RestExceptionHandler.class
 com\lambdaschool\tempEC\controller\EmpConvoController.class
 com\lambdaschool\tempEC\services\ConversationService.class
+com\lambdaschool\tempEC\handlers\ScheduledTask.class
 com\lambdaschool\tempEC\config\SimpleCorsFilter.class
 com\lambdaschool\tempEC\EmpoweredConversationApplication.class
 com\lambdaschool\tempEC\config\WebConfig.class
